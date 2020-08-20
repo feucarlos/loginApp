@@ -24,7 +24,7 @@ export class AuthService {
   }
 
   logout() {
-    
+    localStorage.removeItem('token');
   }
 
   login( usuario: UsuarioModel ) {
@@ -69,6 +69,10 @@ export class AuthService {
   private guardarToken( idToken: string ){
     this.userToken = idToken;
     localStorage.setItem('token', idToken);
+
+    const hoy = new Date();
+    hoy.setTime( hoy.getTime() + 3600 * 1000 );
+    localStorage.setItem('expira', hoy.getTime().toString() );
   }
 
   leerToken(){
@@ -77,6 +81,22 @@ export class AuthService {
     } else {
       this.userToken = '';
     }
+  }
+
+  estaAuntenticado(){
+    if ( this.userToken.length < 2 ){
+      return false;
+    }
+
+    const expira = Number( localStorage.getItem('expira') );
+    const ahora = new Date().getTime();
+
+    if ( expira > ahora ){
+      return true;
+    } else {
+      return false;
+    }
+
   }
 
 }
